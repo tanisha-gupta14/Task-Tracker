@@ -5,6 +5,7 @@ import com.tan.tasks.domain.entities.Task;
 import com.tan.tasks.domain.entities.TaskList;
 import com.tan.tasks.mappers.TaskMapper;
 import com.tan.tasks.services.TaskService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
+@PreAuthorize("hasRole('USER')")
 @RequestMapping(path = "task-lists/{task_list_id}/tasks")
 public class TaskController {
 
