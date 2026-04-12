@@ -1,5 +1,6 @@
 package com.tan.tasks.auth.service;
 
+import com.tan.tasks.auth.entity.AuthProvider;
 import com.tan.tasks.auth.entity.Role;
 import com.tan.tasks.auth.entity.User;
 import com.tan.tasks.auth.repository.UserRepository;
@@ -19,14 +20,22 @@ public class UserService {
 
     public User register(String email, String password) {
 
-        if (repo.findByEmail(email).isPresent()) {
-            throw new RuntimeException("Email already exists");
+        if (password == null || password.isBlank()) {
+            throw new RuntimeException("Password is required");
         }
+
+        repo.findByEmail(email).ifPresent(u -> {
+            if (u.getProvider() != AuthProvider.LOCAL) {
+                throw new RuntimeException("Email registered via Google");
+            }
+            throw new RuntimeException("Email already exists");
+        });
 
         User user = new User();
         user.setEmail(email);
         user.setPassword(encoder.encode(password));
         user.setRole(Role.USER);
+        user.setProvider(AuthProvider.LOCAL);
 
         return repo.save(user);
     }
@@ -35,8 +44,10 @@ public class UserService {
 
         User user = repo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
-
-        if (!encoder.matches(password, user.getPassword())) {
+        if (user.getProvider() != AuthProvider.LOCAL) {
+            throw new RuntimeException("Use Google login");
+        }
+        if (user.getPassword() == null || !encoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
