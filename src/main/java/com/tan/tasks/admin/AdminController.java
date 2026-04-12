@@ -10,6 +10,8 @@ import com.tan.tasks.domain.entities.Task;
 import com.tan.tasks.domain.entities.TaskStatus;
 import com.tan.tasks.repositories.TaskListRepository;
 import com.tan.tasks.repositories.TaskRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,11 +42,9 @@ public class AdminController {
 
 
     @GetMapping("/users")
-    public List<AdminUserDto> listUsers() {
-        return userRepo.findByRole(Role.USER)
-                .stream()
-                .map(u -> new AdminUserDto(u.getEmail()))
-                .toList();
+    public Page<AdminUserDto> listUsers(Pageable pageable) {
+        return userRepo.findByRole(Role.USER, pageable)
+                .map(u -> new AdminUserDto(u.getEmail()));
     }
 
 
