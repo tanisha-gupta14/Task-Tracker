@@ -55,3 +55,64 @@ spring.datasource.username=${DB_USERNAME}
 spring.datasource.password=${DB_PASSWORD}
 
 spring.jpa.hibernate.ddl-auto=update
+```
+## Run
+From the project root:
+
+- `./mvnw clean install`
+- `./mvnw spring-boot:run`
+- `./mvnw test`
+- `./mvnw package`
+
+Or build and run:
+
+- `./mvnw clean package`
+- `./mvnw package`
+- `java -jar target/tasks-0.0.1-SNAPSHOT.jar`
+- `java -jar target/tasks-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod`
+
+## API Endpoints
+
+### Authentication
+
+- `POST /auth/register`
+  - Request body:
+    ```json
+    { "email": "user@example.com", "password": "password" }
+    ```
+- `POST /auth/login-user`
+  - Request body:
+    ```json
+    { "email": "user@example.com", "password": "password" }
+    ```
+  - Response returns a JWT token
+
+### Task Lists (`USER` role)
+
+- `GET /task-lists`
+- `POST /task-lists`
+- `GET /task-lists/{task_list_id}`
+- `PUT /task-lists/{task_list_id}`
+- `DELETE /task-lists/{task_list_id}`
+
+### Tasks (`USER` role)
+
+- `GET /task-lists/{task_list_id}/tasks`
+- `POST /task-lists/{task_list_id}/tasks`
+- `GET /task-lists/{task_list_id}/tasks/{task_id}`
+- `PUT /task-lists/{task_list_id}/tasks/{task_id}`
+- `DELETE /task-lists/{task_list_id}/tasks/{task_id}`
+
+### Admin (`ADMIN` role)
+
+- `GET /admin/users`
+- `GET /admin/users/{email}/task-lists`
+- `GET /admin/task-lists/{taskListId}/tasks`
+
+## Authorization
+Send the JWT token in requests:
+
+- `Authorization: Bearer <token>`
+- Replace `<token>` with the JWT returned by login
+- Use the token for all protected endpoints
+- Ensure the authenticated user has the proper role
